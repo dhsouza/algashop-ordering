@@ -112,7 +112,7 @@ public class Customer {
         return document;
     }
 
-    public Boolean promotionNotificationsAllowed() {
+    public Boolean isPromotionNotificationsAllowed() {
         return promotionNotificationsAllowed;
     }
 
