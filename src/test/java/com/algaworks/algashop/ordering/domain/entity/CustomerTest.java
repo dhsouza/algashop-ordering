@@ -21,15 +21,13 @@ class CustomerTest {
 
         Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> {
-                    new Customer(
-                            id,
+                    Customer.brandNew(
                             new FullName("John", "Doe"),
                             new BirthDate(birthDate),
                             new Email("invalid"),
                             new Phone("478-256-2504"),
                             new Document("255-08-0578"),
                             false,
-                            now,
                             Address.builder()
                                     .street("Bourbon Street")
                                     .number("1123")
@@ -44,15 +42,13 @@ class CustomerTest {
 
     @Test
     void given_invalidEmail_whenTryUpdatedCustomerEmail_shouldGenerateException() {
-        Customer customer = new Customer(
-                new CustomerId(),
+        Customer customer = Customer.brandNew(
                 new FullName("John", "Doe"),
                 new BirthDate(LocalDate.of(1991, 7, 5)),
                 new Email("john.doe@gmail.com"),
                 new Phone("478-256-2504"),
                 new Document("255-08-0578"),
                 false,
-                OffsetDateTime.now(),
                 Address.builder()
                         .street("Bourbon Street")
                         .number("1123")
@@ -72,15 +68,13 @@ class CustomerTest {
 
     @Test
     void given_unarchivedCustomer_whenArchive_shouldAnonymize() {
-        Customer customer = new Customer(
-                new CustomerId(),
+        Customer customer = Customer.brandNew(
                 new FullName("John", "Doe"),
                 new BirthDate(LocalDate.of(1991, 7, 5)),
                 new Email("john.doe@gmail.com"),
                 new Phone("478-256-2504"),
                 new Document("255-08-0578"),
                 false,
-                OffsetDateTime.now(),
                 Address.builder()
                         .street("Bourbon Street")
                         .number("1123")
@@ -118,7 +112,7 @@ class CustomerTest {
 
     @Test
     void given_archivedCustomer_whenTryToUpdate_shouldGenerateException() {
-        Customer customer = new Customer(
+        Customer customer = Customer.existing(
                 new CustomerId(),
                 new FullName("Anonymous", "Anonymous"),
                 null,
@@ -162,15 +156,13 @@ class CustomerTest {
 
     @Test
     void given_brandNewCustomer_whenAddLoyaltyPoints_shouldSumPoints() {
-        Customer customer = new Customer(
-                new CustomerId(),
+        Customer customer = Customer.brandNew(
                 new FullName("John", "Doe"),
                 new BirthDate(LocalDate.of(1991, 7, 5)),
                 new Email("john.doe@gmail.com"),
                 new Phone("478-256-2504"),
                 new Document("255-08-0578"),
                 false,
-                OffsetDateTime.now(),
                 Address.builder()
                         .street("Bourbon Street")
                         .number("1123")
@@ -190,15 +182,13 @@ class CustomerTest {
 
     @Test
     void given_brandNewCustomer_whenAddInvalidLoyaltyPoints_shouldGenerateException() {
-        Customer customer = new Customer(
-                new CustomerId(),
+        Customer customer = Customer.brandNew(
                 new FullName("John", "Doe"),
                 new BirthDate(LocalDate.of(1991, 7, 5)),
                 new Email("john.doe@gmail.com"),
                 new Phone("478-256-2504"),
                 new Document("255-08-0578"),
                 false,
-                OffsetDateTime.now(),
                 Address.builder()
                         .street("Bourbon Street")
                         .number("1123")
