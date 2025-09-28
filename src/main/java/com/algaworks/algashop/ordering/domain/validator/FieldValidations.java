@@ -15,13 +15,13 @@ public class FieldValidations {
         requiresValidEmail(email, null);
     }
 
-    public static void requiresValidEmail(String email, String errorMessagge) {
+    public static void requiresValidEmail(String email, String errorMessage) {
         if (email.isBlank()) {
-            throw new IllegalArgumentException(errorMessagge == null ? VALIDATION_ERROR_EMAIL_IS_BLANK : errorMessagge);
+            throw new IllegalArgumentException(errorMessage == null ? VALIDATION_ERROR_EMAIL_IS_BLANK : errorMessage);
         }
 
         if (!EmailValidator.getInstance().isValid(email)) {
-            throw new IllegalArgumentException(errorMessagge == null ? VALIDATION_ERROR_EMAIL_IS_INVALID : errorMessagge);
+            throw new IllegalArgumentException(errorMessage == null ? VALIDATION_ERROR_EMAIL_IS_INVALID : errorMessage);
         }
     }
 }

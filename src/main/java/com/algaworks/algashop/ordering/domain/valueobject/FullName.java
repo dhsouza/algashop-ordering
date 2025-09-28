@@ -1,6 +1,5 @@
 package com.algaworks.algashop.ordering.domain.valueobject;
 
-import java.io.Serializable;
 import java.util.Objects;
 
 public record FullName(String firstName, String lastName) {
