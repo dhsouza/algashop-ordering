@@ -2,6 +2,8 @@ package com.algaworks.algashop.ordering.domain.validator;
 
 import org.apache.commons.validator.routines.EmailValidator;
 
+import java.util.Objects;
+
 import static com.algaworks.algashop.ordering.domain.exception.ErrorMessages.VALIDATION_ERROR_EMAIL_IS_BLANK;
 import static com.algaworks.algashop.ordering.domain.exception.ErrorMessages.VALIDATION_ERROR_EMAIL_IS_INVALID;
 
@@ -9,6 +11,18 @@ public class FieldValidations {
 
     private FieldValidations() {
         throw new IllegalStateException("Utility class");
+    }
+
+    public static void requiresNonBlank(String value) {
+        requiresNonBlank(value, "");
+    }
+
+    public static void requiresNonBlank(String value, String errorMessage) {
+        Objects.requireNonNull(value, errorMessage);
+
+        if (value.isBlank()) {
+            throw new IllegalArgumentException(errorMessage == null ? value + " cannot be blank" : errorMessage);
+        }
     }
 
     public static void requiresValidEmail(String email) {
