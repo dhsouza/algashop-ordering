@@ -8,7 +8,7 @@ public record Money (BigDecimal value) implements Comparable<Money> {
 
     private static final RoundingMode ROUNDING_MODE = RoundingMode.HALF_EVEN;
 
-    private static final Money ZERO = new Money(BigDecimal.ZERO);
+    public static final Money ZERO = new Money(BigDecimal.ZERO);
 
     public Money(String value) {
         this(new BigDecimal(value));
