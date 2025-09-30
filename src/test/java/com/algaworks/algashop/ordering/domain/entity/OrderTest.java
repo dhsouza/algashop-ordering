@@ -68,7 +68,7 @@ class OrderTest {
         Set<OrderItem> items = order.items();
 
         Assertions.assertThatExceptionOfType(UnsupportedOperationException.class)
-                        .isThrownBy(items::clear);
+                .isThrownBy(items::clear);
     }
 
     @Test
@@ -167,7 +167,7 @@ class OrderTest {
                 .zipCode(new ZipCode("79911"))
                 .build();
 
-        ShippingInfo shipping  = ShippingInfo.builder()
+        ShippingInfo shipping = ShippingInfo.builder()
                 .address(address)
                 .document(new Document("000-23-2314"))
                 .phone(new Phone("230-437-2134"))
@@ -199,7 +199,7 @@ class OrderTest {
                 .zipCode(new ZipCode("79911"))
                 .build();
 
-        ShippingInfo shipping  = ShippingInfo.builder()
+        ShippingInfo shipping = ShippingInfo.builder()
                 .address(address)
                 .document(new Document("000-23-2314"))
                 .phone(new Phone("230-437-2134"))
@@ -212,5 +212,23 @@ class OrderTest {
 
         Assertions.assertThatExceptionOfType(OrderInvalidShippingDeliveryDateException.class)
                 .isThrownBy(() -> order.changeShippingInfo(shipping, shippingCost, deliveryDate));
+    }
+
+    @Test
+    void givenDraftOrder_whenChangeItem_shouldRecalculateTotals() {
+        Order order = Order.draft(new CustomerId());
+        order.addItem(new ProductId(),
+                new ProductName("Mouse pad"),
+                new Money("10.00"),
+                new Quantity(3));
+
+        OrderItem next = order.items().iterator().next();
+
+        order.changeItemQuantity(next.id(), new Quantity(5));
+
+        Assertions.assertWith(order,
+                o -> Assertions.assertThat(o.totalAmount()).isEqualTo(new Money("50.00")),
+                o -> Assertions.assertThat(o.totalItems()).isEqualTo(new Quantity(5))
+        );
     }
 }
