@@ -72,7 +72,7 @@ class OrderTest {
     }
 
     @Test
-    public void shouldCalculateTotals() {
+    void shouldCalculateTotals() {
         Order order = Order.draft(new CustomerId());
         ProductId productId = new ProductId();
 
