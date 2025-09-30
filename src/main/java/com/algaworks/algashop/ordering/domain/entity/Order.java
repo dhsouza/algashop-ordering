@@ -1,5 +1,6 @@
 package com.algaworks.algashop.ordering.domain.entity;
 
+import com.algaworks.algashop.ordering.domain.exception.OrderInvalidShippingDeliveryDateException;
 import com.algaworks.algashop.ordering.domain.exception.OrderStatusCannotBeChangedException;
 import com.algaworks.algashop.ordering.domain.valueobject.*;
 import com.algaworks.algashop.ordering.domain.valueobject.id.CustomerId;
@@ -114,14 +115,28 @@ public class Order {
         this.changeStatus(OrderStatus.PLACED);
     }
 
-    private void changeStatus(OrderStatus newOrderStatus) {
-        Objects.requireNonNull(newOrderStatus);
+    public void changePaymentMethod(PaymentMethod newPaymentMethod) {
+        Objects.requireNonNull(newPaymentMethod);
+        this.setPaymentMethod(newPaymentMethod);
+    }
 
-        if (this.status().canNotChangeTo(newOrderStatus)) {
-            throw new OrderStatusCannotBeChangedException(this.id(), this.status(), newOrderStatus);
+    public void changeBillingInfo(BillingInfo newBillingInfo) {
+        Objects.requireNonNull(newBillingInfo);
+        this.setBilling(newBillingInfo);
+    }
+
+    public void changeShippingInfo(ShippingInfo shipping, Money shippingCost, LocalDate expectedDeliveryDate) {
+        Objects.requireNonNull(shipping);
+        Objects.requireNonNull(shippingCost);
+        Objects.requireNonNull(expectedDeliveryDate);
+
+        if (expectedDeliveryDate.isBefore(LocalDate.now())) {
+            throw new OrderInvalidShippingDeliveryDateException(this.id());
         }
 
-        this.setStatus(newOrderStatus);
+        this.setShipping(shipping);
+        this.setShippingCost(shippingCost);
+        this.setExpectedDeliveryDate(expectedDeliveryDate);
     }
 
     public boolean isDraft() {
@@ -210,6 +225,16 @@ public class Order {
 
         this.setTotalAmount(new Money(totalAmount));
         this.setTotalItems(new Quantity(totalItemsQuantity));
+    }
+
+    private void changeStatus(OrderStatus newOrderStatus) {
+        Objects.requireNonNull(newOrderStatus);
+
+        if (this.status().canNotChangeTo(newOrderStatus)) {
+            throw new OrderStatusCannotBeChangedException(this.id(), this.status(), newOrderStatus);
+        }
+
+        this.setStatus(newOrderStatus);
     }
 
     private void setId(OrderId id) {
