@@ -96,7 +96,7 @@ class OrderTest {
 
     @Test
     void givenDraftOrder_whenPlace_shouldChangeToPlaced() {
-        Order order = Order.draft(new CustomerId());
+        Order order = OrderTestDataBuilder.anOrder().build();
 
         order.place();
 
@@ -104,10 +104,16 @@ class OrderTest {
     }
 
     @Test
-    void givenPlacedOrder_whenTryToPlace_shouldGenerateException() {
-        Order order = Order.draft(new CustomerId());
+    void givenPlacedOrder_whenMarkAsPaid_shouldChangeToPaid() {
+        Order order = OrderTestDataBuilder.anOrder().status(OrderStatus.PLACED).build();
+        order.markAsPaid();
+        Assertions.assertThat(order.isPaid()).isTrue();
+        Assertions.assertThat(order.paidAt()).isNotNull();
+    }
 
-        order.place();
+    @Test
+    void givenPlacedOrder_whenTryToPlace_shouldGenerateException() {
+        Order order = OrderTestDataBuilder.anOrder().status(OrderStatus.PLACED).build();
 
         Assertions.assertThatExceptionOfType(OrderStatusCannotBeChangedException.class)
                 .isThrownBy(order::place);
@@ -121,6 +127,7 @@ class OrderTest {
 
         Assertions.assertThat(order.paymentMethod()).isEqualTo(PaymentMethod.CREDIT_CARD);
     }
+
 
     @Test
     void givenDraftOrder_whenChangeBillingInfo_shouldAllowChange() {
