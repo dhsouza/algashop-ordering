@@ -95,13 +95,10 @@ public class Order {
         );
     }
 
-    public void addItem(ProductId productId, ProductName productName,
-                        Money price, Quantity quantity) {
+    public void addItem(Product product, Quantity quantity) {
         OrderItem orderItem = OrderItem.brandNew()
                 .orderId(this.id)
-                .productId(productId)
-                .productName(productName)
-                .price(price)
+                .product(product)
                 .quantity(quantity)
                 .build();
 
