@@ -96,6 +96,11 @@ public class Order {
     }
 
     public void addItem(Product product, Quantity quantity) {
+        Objects.requireNonNull(product);
+        Objects.requireNonNull(quantity);
+
+        product.checkOutOfStock();
+
         OrderItem orderItem = OrderItem.brandNew()
                 .orderId(this.id)
                 .product(product)
