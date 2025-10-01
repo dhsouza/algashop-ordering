@@ -1,5 +1,6 @@
 package com.algaworks.algashop.ordering.domain.entity;
 
+import com.algaworks.algashop.ordering.domain.exception.OrderCannotBeEditedException;
 import com.algaworks.algashop.ordering.domain.exception.OrderInvalidShippingDeliveryDateException;
 import com.algaworks.algashop.ordering.domain.exception.OrderStatusCannotBeChangedException;
 import com.algaworks.algashop.ordering.domain.exception.ProductOutOfStockException;
@@ -191,5 +192,28 @@ class OrderTest {
                         order.addItem(ProductTestDataBuilder.aProductUnavailable().build(), new Quantity(1))
                 );
 
+    }
+
+    @Test
+    void givenAPlacedOrder_whenTryToEdit_shouldGenerateException() {
+        Order order = OrderTestDataBuilder.anOrder().build();
+
+        order.place();
+
+        Assertions.assertThatExceptionOfType(OrderCannotBeEditedException.class)
+                .isThrownBy(() ->
+                        order.changePaymentMethod(PaymentMethod.CREDIT_CARD));
+
+        Assertions.assertThatExceptionOfType(OrderCannotBeEditedException.class)
+                .isThrownBy(() ->
+                        order.changeBilling(OrderTestDataBuilder.aBilling()));
+
+        Assertions.assertThatExceptionOfType(OrderCannotBeEditedException.class)
+                .isThrownBy(() ->
+                        order.changeShipping(OrderTestDataBuilder.aShipping()));
+
+        Assertions.assertThatExceptionOfType(OrderCannotBeEditedException.class)
+                .isThrownBy(() ->
+                        order.addItem(ProductTestDataBuilder.aProductAltMousePad().build(), new Quantity(1)));
     }
 }
