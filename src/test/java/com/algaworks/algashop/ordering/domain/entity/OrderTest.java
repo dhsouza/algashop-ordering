@@ -86,7 +86,6 @@ class OrderTest {
     @Test
     void givenDraftOrder_whenPlace_shouldChangeToPlaced() {
         Order order = OrderTestDataBuilder.anOrder().build();
-
         order.place();
 
         Assertions.assertThat(order.status()).isEqualTo(OrderStatus.PLACED);
@@ -96,6 +95,7 @@ class OrderTest {
     void givenPlacedOrder_whenMarkAsPaid_shouldChangeToPaid() {
         Order order = OrderTestDataBuilder.anOrder().status(OrderStatus.PLACED).build();
         order.markAsPaid();
+
         Assertions.assertThat(order.isPaid()).isTrue();
         Assertions.assertThat(order.paidAt()).isNotNull();
     }
@@ -111,7 +111,6 @@ class OrderTest {
     @Test
     void givenDraftOrder_whenChangePaymentMethod_shouldAllowChange() {
         Order order = Order.draft(new CustomerId());
-
         order.changePaymentMethod(PaymentMethod.CREDIT_CARD);
 
         Assertions.assertThat(order.paymentMethod()).isEqualTo(PaymentMethod.CREDIT_CARD);
@@ -120,26 +119,10 @@ class OrderTest {
 
     @Test
     void givenDraftOrder_whenChangeBilling_shouldAllowChange() {
-        Address address = Address.builder()
-                .street("Bourbon Street")
-                .number("1234")
-                .neighborhood("North Ville")
-                .complement("Apt. 114")
-                .city("New York")
-                .state("South California")
-                .zipCode(new ZipCode("79911"))
-                .build();
-
-        BillingInfo billing = BillingInfo.builder()
-                .address(address)
-                .document(new Document("000-23-2314"))
-                .phone(new Phone("230-437-2134"))
-                .fullName(new FullName("John", "Doe"))
-                .build();
+        Billing billing = OrderTestDataBuilder.aBilling();
 
         Order order = Order.draft(new CustomerId());
-
-        order.changeBillingInfo(billing);
+        order.changeBilling(billing);
 
         Assertions.assertThat(order.billing()).isEqualTo(billing);
     }
@@ -147,8 +130,8 @@ class OrderTest {
     @Test
     void givenDraftOrder_whenChangeShipping_shouldAllowChange() {
         Shipping shipping = OrderTestDataBuilder.aShipping();
-        Order order = Order.draft(new CustomerId());
 
+        Order order = Order.draft(new CustomerId());
         order.changeShipping(shipping);
 
         Assertions.assertWith(order,
