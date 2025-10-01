@@ -119,7 +119,7 @@ class OrderTest {
 
 
     @Test
-    void givenDraftOrder_whenChangeBillingInfo_shouldAllowChange() {
+    void givenDraftOrder_whenChangeBilling_shouldAllowChange() {
         Address address = Address.builder()
                 .street("Bourbon Street")
                 .number("1234")
@@ -145,62 +145,27 @@ class OrderTest {
     }
 
     @Test
-    void givenDraftOrder_whenChangeShippingInfo_shouldAllowChange() {
-        Address address = Address.builder()
-                .street("Bourbon Street")
-                .number("1234")
-                .neighborhood("North Ville")
-                .complement("Apt. 114")
-                .city("New York")
-                .state("South California")
-                .zipCode(new ZipCode("79911"))
-                .build();
-
-        ShippingInfo shipping = ShippingInfo.builder()
-                .address(address)
-                .document(new Document("000-23-2314"))
-                .phone(new Phone("230-437-2134"))
-                .fullName(new FullName("John", "Doe"))
-                .build();
-
+    void givenDraftOrder_whenChangeShipping_shouldAllowChange() {
+        Shipping shipping = OrderTestDataBuilder.aShipping();
         Order order = Order.draft(new CustomerId());
-        Money shippingCost = Money.ZERO;
-        LocalDate deliveryDate = LocalDate.now().plusDays(1);
 
-        order.changeShippingInfo(shipping, shippingCost, deliveryDate);
+        order.changeShipping(shipping);
 
         Assertions.assertWith(order,
-                o -> Assertions.assertThat(o.shipping()).isEqualTo(shipping),
-                o -> Assertions.assertThat(o.shippingCost()).isEqualTo(shippingCost),
-                o -> Assertions.assertThat(o.expectedDeliveryDate()).isEqualTo(deliveryDate)
+                o -> Assertions.assertThat(o.shipping()).isEqualTo(shipping)
         );
     }
 
     @Test
-    void givenDraftOrderAndDeliveryDateInThePast_whenChangeShippingInfo_shouldGenerateException() {
-        Address address = Address.builder()
-                .street("Bourbon Street")
-                .number("1234")
-                .neighborhood("North Ville")
-                .complement("Apt. 114")
-                .city("New York")
-                .state("South California")
-                .zipCode(new ZipCode("79911"))
-                .build();
-
-        ShippingInfo shipping = ShippingInfo.builder()
-                .address(address)
-                .document(new Document("000-23-2314"))
-                .phone(new Phone("230-437-2134"))
-                .fullName(new FullName("John", "Doe"))
+    void givenDraftOrderAndDeliveryDateInThePast_whenChangeShipping_shouldGenerateException() {
+        Shipping shipping = OrderTestDataBuilder.aShipping().toBuilder()
+                .expectedDate(LocalDate.now().minusDays(2))
                 .build();
 
         Order order = Order.draft(new CustomerId());
-        Money shippingCost = Money.ZERO;
-        LocalDate deliveryDate = LocalDate.now().minusDays(2);
 
         Assertions.assertThatExceptionOfType(OrderInvalidShippingDeliveryDateException.class)
-                .isThrownBy(() -> order.changeShippingInfo(shipping, shippingCost, deliveryDate));
+                .isThrownBy(() -> order.changeShipping(shipping));
     }
 
     @Test
