@@ -1,11 +1,9 @@
 package com.algaworks.algashop.ordering.domain.entity;
 
-import com.algaworks.algashop.ordering.domain.exception.OrderCannotBeEditedException;
-import com.algaworks.algashop.ordering.domain.exception.OrderInvalidShippingDeliveryDateException;
-import com.algaworks.algashop.ordering.domain.exception.OrderStatusCannotBeChangedException;
-import com.algaworks.algashop.ordering.domain.exception.ProductOutOfStockException;
+import com.algaworks.algashop.ordering.domain.exception.*;
 import com.algaworks.algashop.ordering.domain.valueobject.*;
 import com.algaworks.algashop.ordering.domain.valueobject.id.CustomerId;
+import com.algaworks.algashop.ordering.domain.valueobject.id.OrderItemId;
 import com.algaworks.algashop.ordering.domain.valueobject.id.ProductId;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -215,5 +213,53 @@ class OrderTest {
         Assertions.assertThatExceptionOfType(OrderCannotBeEditedException.class)
                 .isThrownBy(() ->
                         order.addItem(ProductTestDataBuilder.aProductAltMousePad().build(), new Quantity(1)));
+    }
+
+    @Test
+    void givenAnOrderWithItems_whenRemoveItem_shouldRecalculateTotals() {
+        Order order = Order.draft(new CustomerId());
+
+        order.addItem(
+                ProductTestDataBuilder.aProductAltMousePad().build(),
+                new Quantity(2)
+        );
+
+        OrderItemId id = order.items().iterator().next().id();
+
+        order.addItem(
+                ProductTestDataBuilder.aProductAltRamMemory().build(),
+                new Quantity(1)
+        );
+
+        Assertions.assertThat(order.totalAmount()).isEqualTo(new Money("400"));
+        Assertions.assertThat(order.totalItems()).isEqualTo(new Quantity(3));
+
+
+        order.removeItem(id);
+
+        Assertions.assertThat(order.totalAmount()).isEqualTo(new Money("200"));
+        Assertions.assertThat(order.totalItems()).isEqualTo(new Quantity(1));
+    }
+
+    @Test
+    void givenAnOrderWithItems_whenRemoveNotFoundItem_shouldGenerateException() {
+        Order order = OrderTestDataBuilder.anOrder().build();
+
+        OrderItemId id = new OrderItemId();
+
+        Assertions.assertThatExceptionOfType(OrderDoesNotContainOrderItemException.class)
+                .isThrownBy(() -> order.removeItem(id));
+    }
+
+    @Test
+    void givenAnOrderWithItems_whenTryToRemoveItemButOrderIsNotDraft_shouldGenerateException() {
+        Order order = OrderTestDataBuilder.anOrder().build();
+
+        OrderItemId id = order.items().iterator().next().id();
+
+        order.place();
+
+        Assertions.assertThatExceptionOfType(OrderCannotBeEditedException.class)
+                .isThrownBy(() -> order.removeItem(id));
     }
 }
