@@ -131,6 +131,23 @@ class OrderTest {
     }
 
     @Test
+    void givenPlacedOrder_whenCancel_shouldChangeToCanceled() {
+        Order order = OrderTestDataBuilder.anOrder().status(OrderStatus.PAID).build();
+        order.cancel();
+
+        Assertions.assertThat(order.isCanceled()).isTrue();
+        Assertions.assertThat(order.canceledAt()).isNotNull();
+    }
+
+    @Test
+    void givenPlacedOrder_whenTryToCancel_shouldGenerateException() {
+        Order order = OrderTestDataBuilder.anOrder().status(OrderStatus.CANCELED).build();
+
+        Assertions.assertThatExceptionOfType(OrderStatusCannotBeChangedException.class)
+                .isThrownBy(order::cancel);
+    }
+
+    @Test
     void givenPlacedOrder_whenTryToPlace_shouldGenerateException() {
         Order order = OrderTestDataBuilder.anOrder().status(OrderStatus.PLACED).build();
 
